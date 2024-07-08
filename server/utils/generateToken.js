@@ -6,7 +6,7 @@ const generateTokenAndSetCookie=(userId,res)=>{
     })
 
     res.cookie("token",token,{
-        maxAge:15*24*60*60*1000,
+        maxAge:20 * 24 * 60 * 60 * 1000, // MS,
         httpOnly:true,
         sameSite:"strict",
     })

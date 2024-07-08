@@ -76,3 +76,26 @@ exports.Logout = async (req, res) => {
     res.status(500).json({error:"internal srever error"})
   }
 };
+exports.refreshToken = async (req, res) => {
+  try {
+      const { refreshToken } = req.body;
+      if (!refreshToken) {
+          return res.status(401).json({ error: 'Refresh token required' });
+      }
+
+      const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+      if (!decoded) {
+          return res.status(401).json({ error: 'Invalid refresh token' });
+      }
+
+      const user = await User.findById(decoded.userId);
+      if (!user) {
+          return res.status(404).json({ error: 'User not found' });
+      }
+
+      const accessToken = jwt.sign({ userId: user._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+      res.status(200).json({ accessToken });
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
+};
